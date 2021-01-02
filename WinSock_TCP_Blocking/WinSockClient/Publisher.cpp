@@ -7,14 +7,11 @@
 #include <stdio.h>
 #include <conio.h>
 
+#include"../Libraries/ClientFunctionality.h"
+
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT 27016
 #define BUFER_SIZE 50
-
-typedef struct PUBLISHER_MESSAGE_ST {
-	char topic[50];
-	char message[50];
-} PUBLISHER_MESSAGE;
 
 // Initializes WinSock2 library
 // Returns true if succeeded, false otherwise.
@@ -67,23 +64,13 @@ int  main()
 	while (1) 
 	{
 		printf("Enter Topic:");
-		gets_s(publisher_message.topic,BUFER_SIZE);
+		gets_s(publisher_message.topic, 50);
 
 		printf("Enter Message:");
-		gets_s(publisher_message.message, BUFER_SIZE);
+		gets_s(publisher_message.message, 50);
 
-		// Send an prepared message with null terminator included
-		iResult = send(connectSocket, (char*)&publisher_message, sizeof(publisher_message), 0);
-
-		if (iResult == SOCKET_ERROR)
-		{
-			printf("send failed with error: %d\n", WSAGetLastError());
-			closesocket(connectSocket);
-			WSACleanup();
-			return 1;
-		}
-
-		printf("Bytes Sent: %ld\n", iResult);
+		Publish(connectSocket, publisher_message);
+		
 	}
     // cleanup
     closesocket(connectSocket);

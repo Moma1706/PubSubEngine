@@ -23,6 +23,15 @@ int main()
     int iResult;
     // message to send
 	char messageToSend[BUFER_SIZE];
+	char recv_bufer[DEFAULT_BUFLEN];
+
+	fd_set readfds;
+	FD_ZERO(&readfds);
+
+	// maksimalni period cekanja select funkcije
+	timeval timeVal;
+	timeVal.tv_sec = 1;
+	timeVal.tv_usec = 0;
 
     if(InitializeWindowsSockets() == false)
     {
@@ -55,23 +64,43 @@ int main()
         closesocket(connectSocket);
         WSACleanup();
     }
-	while (1) {
-		// Send an prepared message with null terminator included
-		printf("Enter topic on which you wnat to subscribe: ");
-		gets_s(messageToSend, BUFER_SIZE);
+	
+	// Send an prepared message with null terminator included
+	printf("Enter topic on which you wnat to subscribe: ");
+	gets_s(messageToSend, BUFER_SIZE);
 
-		iResult = send(connectSocket, messageToSend, (int)strlen(messageToSend) + 1, 0);
+	iResult = send(connectSocket, messageToSend, (int)strlen(messageToSend) + 1, 0);
 
-		if (iResult == SOCKET_ERROR)
-		{
-			printf("send failed with error: %d\n", WSAGetLastError());
-			closesocket(connectSocket);
-			WSACleanup();
-			return 1;
-		}
-
-		printf("Bytes Sent: %ld\n", iResult);
+	if (iResult == SOCKET_ERROR)
+	{
+		printf("send failed with error: %d\n", WSAGetLastError());
+		closesocket(connectSocket);
+		WSACleanup();
+		return 1;
 	}
+
+	printf("Bytes Sent: %ld\n", iResult);
+	printf("Messages for %s are: \n", messageToSend);
+	while (1)
+	{
+		iResult = recv(connectSocket, recv_bufer, DEFAULT_BUFLEN, 0);
+		if (iResult > 0) {
+			printf("%s\n", recv_bufer);
+		}
+		else if (iResult == 0)
+		{
+			// connection was closed gracefully
+			printf("Connection with client closed.\n");
+			closesocket(connectSocket);
+		}
+		else
+		{
+			// there was an error during recv
+			printf("recv failed with error: %d\n", WSAGetLastError());
+			closesocket(connectSocket);
+		}
+	}
+	
     // cleanup
     closesocket(connectSocket);
     WSACleanup();

@@ -1,6 +1,11 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+
+#include "../Libraries/Hash_Map.h"
+#include "../Libraries/list.h"
+#include "../Libraries/ServerFuncionality.h"
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27016"
@@ -9,13 +14,26 @@
 
 typedef struct PUBLISHER_MESSAGE_ST {
 	char topic[BUFER_SIZE];
-	char message[BUFER_SIZE];
+	char message[DEFAULT_BUFLEN];
 } PUBLISHER_MESSAGE;
+
+typedef struct SUBSCRIBER_ST {
+	char topic[DEFAULT_BUFLEN];
+	SOCKET accsocket = INVALID_SOCKET;
+} SUBSCRIBER;
 
 bool InitializeWindowsSockets();
 
 int  main(void)
 {
+	PUBLISHER_MESSAGE* publisher_message;
+	SUBSCRIBER* subscriber_struct;
+		
+	ht_t* publisher_map = ht_create();
+	ht_t* subscriber_map = ht_create();
+			
+	int error;
+
 	// Socket used for listening for new clients 
 	SOCKET listenSocket = INVALID_SOCKET;
 	// Socket used for communication with client
@@ -25,7 +43,7 @@ int  main(void)
 	int iResult;
 	// Buffer used for storing incoming data
 	char recvbuf[DEFAULT_BUFLEN];
-
+	
 	fd_set readfds;
 	FD_ZERO(&readfds);
 
@@ -121,7 +139,7 @@ int  main(void)
 		int result = select(0, &readfds, NULL, NULL, &timeVal);
 
 		if (result == 0) {
-			printf("Nothing happened\n");
+			
 		}
 		else if (result == SOCKET_ERROR) {
 
@@ -161,12 +179,30 @@ int  main(void)
 						if (iResult > 50) //message forom publisher
 						{
 							//recieve struct from publisher
-							PUBLISHER_MESSAGE publisher_message = *(PUBLISHER_MESSAGE*)recvbuf;
-							printf("Message received from Publisher: \nTopic: %s\nMessage: %s \n", publisher_message.topic, publisher_message.message);
+							publisher_message = (PUBLISHER_MESSAGE*)recvbuf;
+							printf("Message received from Publisher: \nTopic: %s\nMessage: %s \n", publisher_message->topic, publisher_message->message);
+						
+							ht_set_pub(publisher_map, publisher_message->topic, publisher_message->message); // add new list if there is new key if not add message to the list
+							node_t* test = ht_get(publisher_map, publisher_message->topic);
+							iterate_list(test);
+
 						}
-						else if (iResult <= 50)
+						else if (iResult <= 50) //message form subscriber
 						{
 							printf("Message recieved from Subscriber: \nTopic: %s\n", recvbuf);
+
+							node_t* list_to_send = ht_get(publisher_map, recvbuf); // get messages that client asked for
+
+							send_messages_to_client(list_to_send, acceptedSocket[i]);
+
+							printf("Bytes Sent: %ld\n", iResult);
+													
+							strcpy(subscriber_struct->topic, recvbuf);
+							subscriber_struct->accsocket = acceptedSocket[i];
+
+							
+							
+														
 						}
 					}
 					else if (iResult == 0)
