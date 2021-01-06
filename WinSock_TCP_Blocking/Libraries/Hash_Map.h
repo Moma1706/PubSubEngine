@@ -26,6 +26,9 @@ typedef struct {
 	entry_s_t** entries;
 } ht_s_t;
 
+//CRITICAL_SECTION cs_map_sub;
+//CRITICAL_SECTION cs_map_pub;
+
 //hash function return hash value of key
 extern unsigned int hash(const char* key);  
 
@@ -39,8 +42,8 @@ extern ht_s_t* ht_create_sub(void);
 
 //check if there is an elemet with taht key if  yes add to list if not create list and add element 
 extern void ht_set_pub(ht_t* hashtable, const char* key, char* value);
-extern void ht_set_sub(ht_t* hashtable, const char* key, SOCKET socket);
+extern void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket);
 
 //get element by key returns list of elements whitch are plased under the same key
 extern node_t* ht_get(ht_t* hashtable, const char* key);
-extern node_s_t* ht_get_sub(ht_t* hashtable, const char* key);
+extern node_s_t* ht_get_sub(ht_s_t* hashtable, const char* key);

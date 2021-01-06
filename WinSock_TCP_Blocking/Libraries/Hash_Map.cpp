@@ -1,5 +1,4 @@
 #include"Hash_Map.h"
-#include "list.h"
 
 unsigned int hash(const char* key) {
 	unsigned long int value = 0;
@@ -22,9 +21,11 @@ entry_t* ht_pair(const char* key,  node_t* value) {
 	entry->key = (char*)malloc(strlen(key) + 1);
 	entry->value = (node_t*)malloc(sizeof(node_t) + 1);
 
+	//EnterCriticalSection(&cs_list_pub);
 	// copy the key and value in place
 	strcpy(entry->key, key);
 	entry->value = value;
+	//LeaveCriticalSection(&cs_list_pub);
 
 	// next starts out null but may be set later on
 	entry->next = NULL;
@@ -38,9 +39,11 @@ entry_s_t* ht_pair_sub(const char* key, node_s_t* value) {
 	entry->key = (char*)malloc(strlen(key) + 1);
 	entry->value = (node_s_t*)malloc(sizeof(node_s_t) + 1);
 
+	//EnterCriticalSection(&cs_list_pub);
 	// copy the key and value in place
 	strcpy(entry->key, key);
 	entry->value = value;
+	//LeaveCriticalSection(&cs_list_pub);
 
 	// next starts out null but may be set later on
 	entry->next = NULL;
@@ -49,6 +52,8 @@ entry_s_t* ht_pair_sub(const char* key, node_s_t* value) {
 }
 
 ht_t* ht_create(void) {
+
+	//InitializeCriticalSection(&cs_list_pub);
 	// allocate table
 	ht_t* hashtable = (ht_t*)malloc(sizeof(ht_t) * 1);
 
@@ -57,14 +62,17 @@ ht_t* ht_create(void) {
 
 	// set each to null (needed for proper operation)
 	int i = 0;
+	//EnterCriticalSection(&cs_list_pub);
 	for (; i < TABLE_SIZE; ++i) {
 		hashtable->entries[i] = NULL;
 	}
+	//LeaveCriticalSection(&cs_list_pub);
 
 	return hashtable;
 }
 
 ht_s_t* ht_create_sub(void) {
+	//InitializeCriticalSection(&cs_list_pub);
 	// allocate table
 	ht_s_t* hashtable = (ht_s_t*)malloc(sizeof(ht_s_t) * 1);
 
@@ -73,9 +81,11 @@ ht_s_t* ht_create_sub(void) {
 
 	// set each to null (needed for proper operation)
 	int i = 0;
+	//EnterCriticalSection(&cs_list_pub);
 	for (; i < TABLE_SIZE; ++i) {
 		hashtable->entries[i] = NULL;
 	}
+	//LeaveCriticalSection(&cs_list_pub);
 
 	return hashtable;
 }
@@ -84,7 +94,9 @@ void ht_set_pub(ht_t* hashtable, const char* key, char* message) {
 	unsigned int slot = hash(key);
 
 	// try to look up an entry set
+	//EnterCriticalSection(&cs_list_pub);
 	entry_t* entry = hashtable->entries[slot];
+	//LeaveCriticalSection(&cs_list_pub);
 	
 	// no entry means slot empty, insert immediately
 	if (entry == NULL) {
@@ -107,7 +119,7 @@ void ht_set_pub(ht_t* hashtable, const char* key, char* message) {
 		if (strcmp(entry->key, key) == 0) {
 			// match found, replace value
 			push_to_the_end(&hashtable->entries[slot]->value, message);
-			//iterate_list(hashtable->entries[slot]->value);
+			
 			return;
 		}
 		// walk to next
@@ -119,8 +131,11 @@ void ht_set_pub(ht_t* hashtable, const char* key, char* message) {
 void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket) {
 	unsigned int slot = hash(key);
 
+
 	// try to look up an entry set
+	//EnterCriticalSection(&cs_list_pub);
 	entry_s_t* entry = hashtable->entries[slot];
+	//LeaveCriticalSection(&cs_list_pub);
 
 	// no entry means slot empty, insert immediately
 	if (entry == NULL) {
@@ -143,7 +158,7 @@ void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket) {
 		if (strcmp(entry->key, key) == 0) {
 			// match found, replace value
 			push_to_the_end_sub(&hashtable->entries[slot]->value, socket);
-			//iterate_list(hashtable->entries[slot]->value);
+			
 			return;
 		}
 		// walk to next
@@ -158,7 +173,9 @@ node_t* ht_get(ht_t* hashtable, const char* key) {
 	unsigned int slot = hash(key);
 
 	// try to find a valid slot
+	//EnterCriticalSection(&cs_list_pub);
 	entry_t* entry = hashtable->entries[slot];
+	//LeaveCriticalSection(&cs_list_pub);
 
 	// no slot means no entry
 	if (entry == NULL) {
@@ -184,7 +201,9 @@ node_s_t* ht_get_sub(ht_s_t* hashtable, const char* key) {
 	unsigned int slot = hash(key);
 
 	// try to find a valid slot
+	//EnterCriticalSection(&cs_list_pub);
 	entry_s_t* entry = hashtable->entries[slot];
+	//LeaveCriticalSection(&cs_list_pub);
 
 	// no slot means no entry
 	if (entry == NULL) {

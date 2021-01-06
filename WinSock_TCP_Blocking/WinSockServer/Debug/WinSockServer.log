@@ -1,5 +1,1 @@
-﻿  Server.cpp
-C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\WinSockServer\Server.cpp(35,6): warning C4101: 'error': unreferenced local variable
-C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\WinSockServer\Server.cpp(200): warning C4700: uninitialized local variable 'subscriber_struct' used
-Server.obj : error LNK2019: unresolved external symbol "void __cdecl ht_set_pub(struct ht_t *,char const *,char *)" (?ht_set_pub@@YAXPAUht_t@@PBDPAD@Z) referenced in function _main
-C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe : fatal error LNK1120: 1 unresolved externals
+﻿  WinSockServer.vcxproj -> C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe
