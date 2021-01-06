@@ -26,7 +26,6 @@ typedef struct {
 	entry_s_t** entries;
 } ht_s_t;
 
-//CRITICAL_SECTION cs_map_sub;
 //CRITICAL_SECTION cs_map_pub;
 
 //hash function return hash value of key
