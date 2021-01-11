@@ -145,12 +145,14 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 					// Receive data until the client shuts down the connection7
 					iResult = recv(acceptedSocket[i], recvbuf, DEFAULT_BUFLEN, 0);
 
+					publisher_message = (PUBLISHER_MESSAGE*)recvbuf;
+
 					if (iResult > 0)
 					{
 						if (iResult > 50) //message forom publisher
 						{
 							//recieve struct from publisher
-							publisher_message = (PUBLISHER_MESSAGE*)recvbuf;
+							
 							printf("Message received from Publisher: \nTopic: %s\nMessage: %s \n", publisher_message->topic, publisher_message->message);
 
 							ht_set_pub(params->publisher_map, publisher_message->topic, publisher_message->message); // add new list if there is new key if not add message to the list
@@ -159,7 +161,7 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 
 							if (list_subs != NULL)
 							{
-								send_message_to_clients(publisher_message->message, list_subs);
+								send_message_to_clients(publisher_message->message, list_subs, publisher_message->topic);
 							}
 						}
 
@@ -168,10 +170,11 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 							printf("Message recieved from Subscriber: \nTopic: %s\n", recvbuf);
 
 							ht_set_sub(params->subscriber_map, recvbuf, acceptedSocket[i]); //add new sub to the map or add new topic 
+							ht_set_socket(params->socket_map, acceptedSocket[i], recvbuf);
 
 							node_t* list_to_send = ht_get(params->publisher_map, recvbuf); // get messages that client asked for
 
-							send_messages_to_client(list_to_send, acceptedSocket[i]);
+							send_messages_to_client(list_to_send, acceptedSocket[i], publisher_message->topic);
 
 							printf("Bytes Sent: %ld\n", iResult);
 						}
@@ -182,6 +185,7 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 						printf("Connection with client closed.\n");
 						closesocket(acceptedSocket[i]);
 						// sort array and clean last place
+
 						for (int j = i; j < lastIndex - 1; j++)
 						{
 							acceptedSocket[j] = acceptedSocket[j + 1];
@@ -195,6 +199,22 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 						// there was an error during recv
 						printf("recv failed with error: %d\n", WSAGetLastError());
 						closesocket(acceptedSocket[i]);
+
+						char* topic = ht_get_topic(params->socket_map, acceptedSocket[i]);
+
+						if (topic != NULL) {
+
+							node_s_t* list_subs = ht_get_sub(params->subscriber_map, topic);
+
+							remove_sub(&list_subs, acceptedSocket[i]);
+
+							//test
+							list_subs = ht_get_sub(params->subscriber_map, topic);
+
+							printf("nesto");
+						}
+						
+
 						// sort array and clean last place
 						for (int j = i; j < lastIndex - 1; j++)
 						{
@@ -220,14 +240,21 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 	return 1;
 }
 
-void send_messages_to_client(node_t* head, SOCKET acceptedSocket)
+void send_messages_to_client(node_t* head, SOCKET acceptedSocket, char* topic)
 {
 	node_t* current = head;
 
 	while (current != NULL) {
 
 		Sleep(200);
-		int iResult = send(acceptedSocket, current->message, (int)strlen(current->message)+1, 0);
+
+		char* result = (char*)malloc((int)strlen(topic) + (int)strlen(current->message) + 2);
+		
+		strcpy(result, topic);
+		strcat(result, ":");
+		strcat(result, current->message);
+
+		int iResult = send(acceptedSocket, result, (int)strlen(result)+1, 0);
 
 		if (iResult == SOCKET_ERROR)
 		{
@@ -240,14 +267,21 @@ void send_messages_to_client(node_t* head, SOCKET acceptedSocket)
 	}
 }
 
-void send_message_to_clients(char* message, node_s_t* head) {
+void send_message_to_clients(char* message, node_s_t* head, char* topic) {
 	
 	node_s_t* current = head;
 
 	while (current != NULL)
 	{
 		Sleep(200);
-		int iResult = send(current->socket, message, (int)strlen(message) + 1, 0);
+
+		char* result = (char*)malloc((int)strlen(topic) + (int)strlen(message) + 2);
+
+		strcpy(result, topic);
+		strcat(result, ":");
+		strcat(result, message);
+
+		int iResult = send(current->socket, result, (int)strlen(result) + 1, 0);
 
 		if (iResult == SOCKET_ERROR)
 		{

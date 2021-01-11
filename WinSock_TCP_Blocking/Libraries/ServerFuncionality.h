@@ -22,12 +22,14 @@ typedef struct PUBLISHER_MESSAGE_ST {
 typedef struct SUB_PARAMS_ST {
 	ht_t* publisher_map;
 	ht_s_t* subscriber_map;
+	ht_socket_t* socket_map;
 	char* port;
 }SUB_PARAMS;
 
 typedef struct PUB_PARAMS_ST {
 	ht_t* publisher_map;
 	ht_s_t* subscriber_map;
+	ht_socket_t* socket_map;
 	char* port;
 }PUB_PARAMS;
 
@@ -36,10 +38,10 @@ DWORD WINAPI thread_function(LPVOID lpParam);
 
 
 //send all messages with that topic to one client
-void send_messages_to_client(node_t* head, SOCKET acceptedSocket); 
+void send_messages_to_client(node_t* head, SOCKET acceptedSocket, char* topic); 
 
 //send current message to all clients subscribed to cureent topic
-void send_message_to_clients(char* message, node_s_t* head);
+void send_message_to_clients(char* message, node_s_t* head, char* topic);
 
 bool InitializeWindowsSockets();
 

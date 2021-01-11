@@ -63,7 +63,19 @@ int main()
 
 	SubThread = CreateThread(NULL, 0, &recieve_function, &thread_params, 0, &SubThredId);
 
-	getchar();
+	printf("If you want to subscribe to new topic press 'N'\n");
+
+	while (1)
+	{
+		gets_s(messageToSend, BUFER_SIZE);
+		if (strcmp(messageToSend,"N") == 0) {
+
+			printf("Enter topic on which you wnat to subscribe: ");
+			gets_s(messageToSend, BUFER_SIZE);
+
+			Subscribe(messageToSend, connectSocket);
+		}
+	}
 	   	
     // cleanup
     closesocket(connectSocket);

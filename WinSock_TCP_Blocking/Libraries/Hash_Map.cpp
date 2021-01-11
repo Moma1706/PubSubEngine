@@ -1,6 +1,8 @@
 #include"Hash_Map.h"
 
 CRITICAL_SECTION cs_map_pub;
+CRITICAL_SECTION cs_map_sub;
+CRITICAL_SECTION cs_map_socket;
 
 unsigned int hash(const char* key) {
 	unsigned long int value = 0;
@@ -41,11 +43,29 @@ entry_s_t* ht_pair_sub(const char* key, node_s_t* value) {
 	entry->key = (char*)malloc(strlen(key) + 1);
 	entry->value = (node_s_t*)malloc(sizeof(node_s_t) + 1);
 
-	EnterCriticalSection(&cs_map_pub);
+	EnterCriticalSection(&cs_map_sub);
 	// copy the key and value in place
 	strcpy(entry->key, key);
 	entry->value = value;
-	LeaveCriticalSection(&cs_map_pub);
+	LeaveCriticalSection(&cs_map_sub);
+
+	// next starts out null but may be set later on
+	entry->next = NULL;
+
+	return entry;
+}
+
+entry_socket* ht_pair_socket(SOCKET key, char* value) {
+	// allocate the entry
+	entry_socket* entry = (entry_socket*)malloc(sizeof(entry_socket) * 1);
+	entry->key = (SOCKET)malloc(sizeof(key) + 1);
+	entry->value = (char*)malloc(strlen(value) + 1);
+
+	EnterCriticalSection(&cs_map_socket);
+	// copy the key and value in place
+	entry->key = key;
+	strcpy(entry->value, value);
+	LeaveCriticalSection(&cs_map_socket);
 
 	// next starts out null but may be set later on
 	entry->next = NULL;
@@ -74,7 +94,7 @@ ht_t* ht_create(void) {
 }
 
 ht_s_t* ht_create_sub(void) {
-	//InitializeCriticalSection(&cs_list_pub);
+	InitializeCriticalSection(&cs_map_sub);
 	// allocate table
 	ht_s_t* hashtable = (ht_s_t*)malloc(sizeof(ht_s_t) * 1);
 
@@ -83,11 +103,31 @@ ht_s_t* ht_create_sub(void) {
 
 	// set each to null (needed for proper operation)
 	int i = 0;
-	EnterCriticalSection(&cs_map_pub);
+	EnterCriticalSection(&cs_map_sub);
 	for (; i < TABLE_SIZE; ++i) {
 		hashtable->entries[i] = NULL;
 	}
-	LeaveCriticalSection(&cs_map_pub);
+	LeaveCriticalSection(&cs_map_sub);
+
+	return hashtable;
+}
+
+
+ht_socket_t* ht_create_socket(void) {
+	InitializeCriticalSection(&cs_map_socket);
+	// allocate table
+	ht_socket_t* hashtable = (ht_socket_t*)malloc(sizeof(ht_socket_t) * 1);
+
+	// allocate table entries
+	hashtable->entries = (entry_socket**)malloc(sizeof(entry_socket*) * TABLE_SIZE);
+
+	// set each to null (needed for proper operation)
+	int i = 0;
+	EnterCriticalSection(&cs_map_socket);
+	for (; i < TABLE_SIZE; ++i) {
+		hashtable->entries[i] = NULL;
+	}
+	LeaveCriticalSection(&cs_map_socket);
 
 	return hashtable;
 }
@@ -135,9 +175,9 @@ void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket) {
 
 
 	// try to look up an entry set
-	EnterCriticalSection(&cs_map_pub);
+	EnterCriticalSection(&cs_map_sub);
 	entry_s_t* entry = hashtable->entries[slot];
-	LeaveCriticalSection(&cs_map_pub);
+	LeaveCriticalSection(&cs_map_sub);
 
 	// no entry means slot empty, insert immediately
 	if (entry == NULL) {
@@ -167,8 +207,42 @@ void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket) {
 		prev = entry;
 		entry = prev->next;
 	}
+}
+
+void ht_set_socket(ht_socket_t* hashtable, SOCKET key, char* value) {
+	
+	unsigned int slot = key;
 
 
+	// try to look up an entry set
+	EnterCriticalSection(&cs_map_socket);
+	entry_socket* entry = hashtable->entries[slot];
+	LeaveCriticalSection(&cs_map_socket);
+
+	// no entry means slot empty, insert immediately
+	if (entry == NULL) {
+
+		hashtable->entries[slot] = ht_pair_socket(key, value);
+
+		return;
+	}
+
+	entry_socket* prev;
+
+	// walk through each entry until either the end is
+	// reached or a matching key is found
+	while (entry != NULL) {
+		// check key
+		if (entry->key == key){
+			
+			strcpy(entry->value, value);
+			
+			return;
+		}
+		// walk to next
+		prev = entry;
+		entry = prev->next;
+	}
 }
 
 node_t* ht_get(ht_t* hashtable, const char* key) {
@@ -203,9 +277,9 @@ node_s_t* ht_get_sub(ht_s_t* hashtable, const char* key) {
 	unsigned int slot = hash(key);
 
 	// try to find a valid slot
-	EnterCriticalSection(&cs_map_pub);
+	EnterCriticalSection(&cs_map_sub);
 	entry_s_t* entry = hashtable->entries[slot];
-	LeaveCriticalSection(&cs_map_pub);
+	LeaveCriticalSection(&cs_map_sub);
 
 	// no slot means no entry
 	if (entry == NULL) {
@@ -216,6 +290,34 @@ node_s_t* ht_get_sub(ht_s_t* hashtable, const char* key) {
 	while (entry != NULL) {
 		// return value if found
 		if (strcmp(entry->key, key) == 0) {
+			return entry->value;
+		}
+
+		// proceed to next key if available
+		entry = entry->next;
+	}
+
+	// reaching here means there were >= 1 entries but no key match
+	return NULL;
+}
+
+char* ht_get_topic(ht_socket_t* hashtable, SOCKET key){
+	unsigned int slot = key;
+
+	// try to find a valid slot
+	EnterCriticalSection(&cs_map_socket);
+	entry_socket* entry = hashtable->entries[slot];
+	LeaveCriticalSection(&cs_map_socket);
+
+	// no slot means no entry
+	if (entry == NULL) {
+		return NULL;
+	}
+
+	// walk through each entry in the slot, which could just be a single thing
+	while (entry != NULL) {
+		// return value if found
+		if (entry->key == key){
 			return entry->value;
 		}
 

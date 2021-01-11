@@ -19,7 +19,7 @@ void init_list_sub(node_s_t** head)
 
 void push_to_the_end(node_t** head, char* message) 
 {
-	node_t* new_element = (node_t*)malloc(sizeof(node_t*));
+	node_t* new_element = (node_t*)malloc(sizeof(node_t));
 		
 	strcpy(new_element->message, message);
 	 
@@ -41,7 +41,7 @@ void push_to_the_end(node_t** head, char* message)
 
 void push_to_the_end_sub(node_s_t** head, SOCKET socket)
 {
-	node_s_t* new_element = (node_s_t*)malloc(sizeof(node_s_t*));
+	node_s_t* new_element = (node_s_t*)malloc(sizeof(node_s_t));
 
 	new_element->socket = socket;
 
@@ -79,3 +79,28 @@ void iterate_list_sub(node_s_t* head) {
 	}
 }
 
+void remove_sub(node_s_t** head, SOCKET socket) {
+
+	node_s_t* current = *head;
+	node_s_t* prev = *head;
+	
+	if (current == NULL)
+	{
+		return;
+	}
+
+	while (current != NULL)
+	{
+		if (current->socket == socket)
+		{
+			prev->next = current->next;
+			free(current);
+			return;
+		}
+		prev = current;
+		current = current->next;
+	}
+
+
+
+}
