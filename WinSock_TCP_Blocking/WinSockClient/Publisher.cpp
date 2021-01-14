@@ -39,17 +39,31 @@ int  main()
 
 	Connect(connectSocket, DEFAULT_PUB_PORT);
 
-	while (1) 
+	for (int i = 0; i<100; i++) 
 	{
-		printf("Enter Topic:");
+		/*printf("Enter Topic:");
 		gets_s(publisher_message.topic, 50);
 
 		printf("Enter Message:");
-		gets_s(publisher_message.message, 50);
+		gets_s(publisher_message.message, 50);*/
+
+        Sleep(100);
+
+        char* topic = "topic";
+        char* message = "jako dugacak jedan message";
+
+        strcpy(publisher_message.topic, topic);
+        strcpy(publisher_message.message, message);
+
+        
 
 		Publish(connectSocket, publisher_message);
+        printf("\n%d", i);
 		
 	}
+
+    getchar();
+
     // cleanup
     closesocket(connectSocket);
     WSACleanup();

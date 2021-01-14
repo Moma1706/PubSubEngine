@@ -431,8 +431,8 @@ void ht_del_sub(ht_s_t* hashtable, const char* key) {
 			}
 
 			// free the deleted entry
-			free(entry->key);
-			free(entry->value);
+			//free(entry->key);
+			//free(entry->value);
 			free(entry);
 
 			return;
@@ -518,6 +518,7 @@ void ht_delete_map_pub(ht_t* hashtable) {
 			break;
 		}
 	}
+	free(hashtable);
 }
 
 void ht_delete_map_sub(ht_s_t* hashtable) {
@@ -537,6 +538,7 @@ void ht_delete_map_sub(ht_s_t* hashtable) {
 			break;
 		}
 	}
+	free(hashtable);
 }
 
 void ht_delete_map_socket(ht_socket_t* hashtable) {
@@ -556,4 +558,5 @@ void ht_delete_map_socket(ht_socket_t* hashtable) {
 			break;
 		}
 	}
+	free(hashtable);
 }

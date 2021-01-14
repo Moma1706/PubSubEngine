@@ -75,6 +75,9 @@ int main()
 
 			Subscribe(messageToSend, connectSocket);
 		}
+		if (strcmp(messageToSend, "Q") == 0) {
+			break;
+		}
 	}
 	   	
     // cleanup
