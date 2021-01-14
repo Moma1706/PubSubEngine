@@ -1,3 +1,1 @@
-﻿  Server.cpp
-C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Libraries\Hash_Map.h(34,2): warning C4091: 'typedef ': ignored on left of 'entry_socket' when no variable is declared
-  WinSockServer.vcxproj -> C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe
+﻿  WinSockServer.vcxproj -> C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe

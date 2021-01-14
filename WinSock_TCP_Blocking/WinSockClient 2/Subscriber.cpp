@@ -80,6 +80,7 @@ int main()
     // cleanup
     closesocket(connectSocket);
     WSACleanup();
+	CloseHandle(SubThread);
 	
     return 0;
 }

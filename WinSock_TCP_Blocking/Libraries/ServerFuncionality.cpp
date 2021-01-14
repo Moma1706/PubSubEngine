@@ -228,7 +228,7 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 				else
 				{
 					printf("No message recieved\n");
-					Sleep(2000);
+					Sleep(500);
 				}
 			}
 		}

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "list.h"
 #define TABLE_SIZE 20000
+#define BUFER_SIZE 512
 
 typedef struct entry_t {   //struct for publishers
 	char* key;
@@ -31,14 +32,12 @@ typedef struct entry_socket {  //struct used for storing subscribers with socket
 	SOCKET key;
 	char* value;
 	entry_socket* next;
-};
+}entry_socket;
 
 typedef struct {
 	entry_socket** entries;
 } ht_socket_t;
 
-
-//CRITICAL_SECTION cs_map_pub;
 
 //hash function return hash value of key
 extern unsigned int hash(const char* key);  
@@ -62,3 +61,16 @@ extern void ht_set_socket(ht_socket_t* hashtable, SOCKET key, char* value);
 extern node_t* ht_get(ht_t* hashtable, const char* key);
 extern node_s_t* ht_get_sub(ht_s_t* hashtable, const char* key);
 extern char* ht_get_topic(ht_socket_t* hashtable, SOCKET key);
+
+//delete an element by key
+void ht_del_pub(ht_t* hashtable, const char* key);
+void ht_del_sub(ht_s_t* hashtable, const char* key);
+void ht_del_socket(ht_socket_t* hashtable, SOCKET key);
+
+//delete all map elements
+void ht_delete_map_pub(ht_t* hashtable);
+void ht_delete_map_sub(ht_s_t* hashtable);
+void ht_delete_map_socket(ht_socket_t* hashtable);
+
+//delete critical sections
+extern void delete_cs();

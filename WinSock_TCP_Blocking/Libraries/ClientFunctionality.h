@@ -16,8 +16,8 @@
 #define BUFER_SIZE 50
 
 typedef struct PUBLISHER_MESSAGE_ST {
-	char topic[50];
-	char message[50];
+	char topic[BUFER_SIZE];
+	char message[BUFER_SIZE];
 } PUBLISHER_MESSAGE;
 
 typedef struct THREAD_PARAMS_ST {

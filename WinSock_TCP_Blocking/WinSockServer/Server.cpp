@@ -26,8 +26,29 @@ int  main(void)
 	PubThread = CreateThread(NULL, 0, &thread_function, &pub_params, 0, &PubThreadId);
 
 	SubThread = CreateThread(NULL, 0, &thread_function, &sub_params, 0, &SubThreadId);
-	
-	getchar();
+
+	char quit[BUFER_SIZE] = "";
+
+	bool temp = 1;
+
+	while (temp) {
+		gets_s(quit, BUFER_SIZE);
+
+		if (strcmp(quit, "Q") == 0) {
+
+			delete_cs();
+			CloseHandle(PubThread);
+			CloseHandle(SubThread);
+
+			ht_delete_map_pub(publisher_map);
+			ht_delete_map_socket(socket_map);
+			ht_delete_map_sub(subscriber_map);
+			
+				
+			temp = 0;
+
+		}
+	}
 
 	return 0;
 }

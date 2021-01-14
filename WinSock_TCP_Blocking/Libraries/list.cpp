@@ -3,18 +3,13 @@
 
 void init_list(node_t** head) 
 {
-	//InitializeCriticalSection(&cs_list_pub);
-	//EnterCriticalSection(&cs_list_pub);
 	*head = NULL;
-	//LeaveCriticalSection(&cs_list_pub);
 }
 
 void init_list_sub(node_s_t** head)
 {
-	//InitializeCriticalSection(&cs_list_sub);
-	//EnterCriticalSection(&cs_list_pub);
+
 	*head = NULL;
-	//LeaveCriticalSection(&cs_list_pub);
 }
 
 void push_to_the_end(node_t** head, char* message) 
@@ -26,9 +21,7 @@ void push_to_the_end(node_t** head, char* message)
 	new_element->next = NULL;
 
 	if (*head == NULL) {
-		//EnterCriticalSection(&cs_list_pub);
 		*head = new_element;
-		//LeaveCriticalSection(&cs_list_pub);
 		return;
 	}
 
@@ -48,9 +41,7 @@ void push_to_the_end_sub(node_s_t** head, SOCKET socket)
 	new_element->next = NULL;
 
 	if (*head == NULL) {
-		//EnterCriticalSection(&cs_list_pub);
 		*head = new_element;
-		//LeaveCriticalSection(&cs_list_pub);
 		return;
 	}
 
@@ -81,26 +72,31 @@ void iterate_list_sub(node_s_t* head) {
 
 void remove_sub(node_s_t** head, SOCKET socket) {
 
-	node_s_t* current = *head;
 	node_s_t* prev = *head;
-	
-	if (current == NULL)
+	node_s_t* temp = prev->next;
+		
+	if (prev == NULL)
 	{
 		return;
 	}
 
-	while (current != NULL)
+	if (prev->socket == socket)
 	{
-		if (current->socket == socket)
-		{
-			prev->next = current->next;
-			free(current);
-			return;
-		}
-		prev = current;
-		current = current->next;
+		*head = temp;
+		free(prev);
+		return;
 	}
 
-
+	while (temp != NULL)
+	{
+		if (temp->socket == socket)
+		{
+			prev->next = temp->next;
+			free(temp);
+			return;
+		}
+	}
+	
+	return;
 
 }
