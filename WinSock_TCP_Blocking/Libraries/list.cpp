@@ -8,7 +8,6 @@ void init_list(node_t** head)
 
 void init_list_sub(node_s_t** head)
 {
-
 	*head = NULL;
 }
 

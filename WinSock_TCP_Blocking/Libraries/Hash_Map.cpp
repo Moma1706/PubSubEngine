@@ -145,11 +145,14 @@ void ht_set_pub(ht_t* hashtable, const char* key, char* message) {
 	if (entry == NULL) {
 		
 		node_t* list;
+
+		EnterCriticalSection(&cs_map_pub);
 		init_list(&list);
 		push_to_the_end(&list, message);
+		LeaveCriticalSection(&cs_map_pub);
 
 		hashtable->entries[slot] = ht_pair(key, list);
-		
+
 		return;
 	}
 
@@ -184,8 +187,10 @@ void ht_set_sub(ht_s_t* hashtable, const char* key, SOCKET socket) {
 	if (entry == NULL) {
 
 		node_s_t* list;
+		EnterCriticalSection(&cs_map_sub);
 		init_list_sub(&list);
 		push_to_the_end_sub(&list, socket);
+		LeaveCriticalSection(&cs_map_sub);
 
 		hashtable->entries[slot] = ht_pair_sub(key, list);
 
@@ -236,7 +241,9 @@ void ht_set_socket(ht_socket_t* hashtable, SOCKET key, char* value) {
 		// check key
 		if (entry->key == key){
 			
+			EnterCriticalSection(&cs_map_socket);
 			strcpy(entry->value, value);
+			LeaveCriticalSection(&cs_map_socket);
 			
 			return;
 		}
@@ -341,7 +348,9 @@ void ht_del_pub(ht_t* hashtable, const char* key) {
 	unsigned int bucket = hash(key);
 
 	// try to find a valid bucket
+	EnterCriticalSection(&cs_map_pub);
 	entry_t* entry = hashtable->entries[bucket];
+	LeaveCriticalSection(&cs_map_pub);
 
 	// no bucket means no entry
 	if (entry == NULL) {
@@ -357,28 +366,38 @@ void ht_del_pub(ht_t* hashtable, const char* key) {
 		if (strcmp(entry->key, key) == 0) {
 			// first item and no next entry
 			if (entry->next == NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_pub);
 				hashtable->entries[bucket] = NULL;
+				LeaveCriticalSection(&cs_map_pub);
 			}
 
 			// first item with a next entry
 			if (entry->next != NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_pub);
 				hashtable->entries[bucket] = entry->next;
+				LeaveCriticalSection(&cs_map_pub);
 			}
 
 			// last item
 			if (entry->next == NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_pub);
 				prev->next = NULL;
+				LeaveCriticalSection(&cs_map_pub);
 			}
 
 			// middle item
 			if (entry->next != NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_pub);
 				prev->next = entry->next;
+				LeaveCriticalSection(&cs_map_pub);
 			}
 
 			// free the deleted entry
+			EnterCriticalSection(&cs_map_pub);
 			free(entry->key);
 			free(entry->value);
 			free(entry);
+			LeaveCriticalSection(&cs_map_pub);
 
 			return;
 		}
@@ -396,7 +415,9 @@ void ht_del_sub(ht_s_t* hashtable, const char* key) {
 	unsigned int bucket = hash(key);
 
 	// try to find a valid bucket
+	EnterCriticalSection(&cs_map_sub);
 	entry_s_t* entry = hashtable->entries[bucket];
+	LeaveCriticalSection(&cs_map_sub);
 
 	// no bucket means no entry
 	if (entry == NULL) {
@@ -412,28 +433,38 @@ void ht_del_sub(ht_s_t* hashtable, const char* key) {
 		if (strcmp(entry->key, key) == 0) {
 			// first item and no next entry
 			if (entry->next == NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_sub);
 				hashtable->entries[bucket] = NULL;
+				LeaveCriticalSection(&cs_map_sub);
 			}
 
 			// first item with a next entry
 			if (entry->next != NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_sub);
 				hashtable->entries[bucket] = entry->next;
+				LeaveCriticalSection(&cs_map_sub);
 			}
 
 			// last item
 			if (entry->next == NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_sub);
 				prev->next = NULL;
+				LeaveCriticalSection(&cs_map_sub);
 			}
 
 			// middle item
 			if (entry->next != NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_sub);
 				prev->next = entry->next;
+				LeaveCriticalSection(&cs_map_sub);
 			}
 
 			// free the deleted entry
+			EnterCriticalSection(&cs_map_sub);
 			//free(entry->key);
 			//free(entry->value);
 			free(entry);
+			LeaveCriticalSection(&cs_map_sub);
 
 			return;
 		}
@@ -451,7 +482,9 @@ void ht_del_socket(ht_socket_t* hashtable, SOCKET key) {
 	unsigned int bucket = key;
 
 	// try to find a valid bucket
+	EnterCriticalSection(&cs_map_socket);
 	entry_socket* entry = hashtable->entries[bucket];
+	LeaveCriticalSection(&cs_map_socket);
 
 	// no bucket means no entry
 	if (entry == NULL) {
@@ -467,28 +500,38 @@ void ht_del_socket(ht_socket_t* hashtable, SOCKET key) {
 		if (entry->key == key) {
 			// first item and no next entry
 			if (entry->next == NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_socket);
 				hashtable->entries[bucket] = NULL;
+				LeaveCriticalSection(&cs_map_socket);
 			}
 
 			// first item with a next entry
 			if (entry->next != NULL && idx == 0) {
+				EnterCriticalSection(&cs_map_socket);
 				hashtable->entries[bucket] = entry->next;
+				LeaveCriticalSection(&cs_map_socket);
 			}
 
 			// last item
 			if (entry->next == NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_socket);
 				prev->next = NULL;
+				LeaveCriticalSection(&cs_map_socket);
 			}
 
 			// middle item
 			if (entry->next != NULL && idx != 0) {
+				EnterCriticalSection(&cs_map_socket);
 				prev->next = entry->next;
+				LeaveCriticalSection(&cs_map_socket);
 			}
 
 			// free the deleted entry
+			EnterCriticalSection(&cs_map_socket);
 			//free(&entry->key);
 			//free(entry->value);
 			free(entry);
+			LeaveCriticalSection(&cs_map_socket);
 
 			return;
 		}
@@ -505,7 +548,9 @@ void ht_delete_map_pub(ht_t* hashtable) {
 
 	for (int i = 0; i < TABLE_SIZE; ++i) {
 
+		EnterCriticalSection(&cs_map_pub);
 		entry_t* entry = hashtable->entries[i];
+		LeaveCriticalSection(&cs_map_pub);
 
 		if (entry == NULL) {
 			continue;
@@ -518,14 +563,18 @@ void ht_delete_map_pub(ht_t* hashtable) {
 			break;
 		}
 	}
+	EnterCriticalSection(&cs_map_pub);
 	free(hashtable);
+	LeaveCriticalSection(&cs_map_pub);
 }
 
 void ht_delete_map_sub(ht_s_t* hashtable) {
 
 	for (int i = 0; i < TABLE_SIZE; ++i) {
 
+		EnterCriticalSection(&cs_map_sub);
 		entry_s_t* entry = hashtable->entries[i];
+		LeaveCriticalSection(&cs_map_sub);
 
 		if (entry == NULL) {
 			continue;
@@ -538,14 +587,18 @@ void ht_delete_map_sub(ht_s_t* hashtable) {
 			break;
 		}
 	}
+	EnterCriticalSection(&cs_map_sub);
 	free(hashtable);
+	LeaveCriticalSection(&cs_map_sub);
 }
 
 void ht_delete_map_socket(ht_socket_t* hashtable) {
 
 	for (int i = 0; i < TABLE_SIZE; ++i) {
 
+		EnterCriticalSection(&cs_map_socket);
 		entry_socket* entry = hashtable->entries[i];
+		LeaveCriticalSection(&cs_map_socket);
 
 		if (entry == NULL) {
 			continue;
@@ -558,5 +611,7 @@ void ht_delete_map_socket(ht_socket_t* hashtable) {
 			break;
 		}
 	}
+	EnterCriticalSection(&cs_map_socket);
 	free(hashtable);
+	LeaveCriticalSection(&cs_map_socket);
 }

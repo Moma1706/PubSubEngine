@@ -49,7 +49,7 @@ void Publish(SOCKET socket, PUBLISHER_MESSAGE publisher_message) {
 	printf("Bytes Sent: %ld\n", iResult);
 }
 
-DWORD WINAPI recieve_function(LPVOID lpParam)
+DWORD WINAPI receive_function(LPVOID lpParam)
 {
 	THREAD_PARAMS* params = (THREAD_PARAMS*)lpParam;
 	

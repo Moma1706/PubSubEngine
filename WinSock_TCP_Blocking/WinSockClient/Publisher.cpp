@@ -39,30 +39,15 @@ int  main()
 
 	Connect(connectSocket, DEFAULT_PUB_PORT);
 
-	for (int i = 0; i<100; i++) 
-	{
-		/*printf("Enter Topic:");
-		gets_s(publisher_message.topic, 50);
-
-		printf("Enter Message:");
-		gets_s(publisher_message.message, 50);*/
-
-        Sleep(100);
-
-        char* topic = "topic";
-        char* message = "jako dugacak jedan message";
-
-        strcpy(publisher_message.topic, topic);
-        strcpy(publisher_message.message, message);
-
-        
+	while(1)
+    {
+        printf("Enter topic: ");
+        gets_s(publisher_message.topic, BUFER_SIZE);
+        printf("Enter message: ");
+        gets_s(publisher_message.message, BUFER_SIZE);
 
 		Publish(connectSocket, publisher_message);
-        printf("\n%d", i);
-		
 	}
-
-    getchar();
 
     // cleanup
     closesocket(connectSocket);

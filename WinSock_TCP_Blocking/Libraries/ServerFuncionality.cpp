@@ -208,10 +208,6 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 
 							remove_sub(&list_subs, acceptedSocket[i]);
 
-							//test
-							list_subs = ht_get_sub(params->subscriber_map, topic);
-
-							printf("nesto");
 						}
 						
 
@@ -227,7 +223,6 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 				}
 				else
 				{
-					printf("No message recieved\n");
 					Sleep(500);
 				}
 			}

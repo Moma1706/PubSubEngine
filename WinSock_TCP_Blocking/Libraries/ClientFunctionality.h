@@ -25,7 +25,14 @@ typedef struct THREAD_PARAMS_ST {
 	char buffer[DEFAULT_BUFLEN];
 }THREAD_PARAMS;
 
+ // Connect clients to specific port 
  void Connect(SOCKET socket, int port);
+
+ // Send data to server from Subscriber
  void Subscribe(char* topic, SOCKET socket);
+
+ // Send data to server from Publisher
  void Publish(SOCKET socket, PUBLISHER_MESSAGE publisher_message);
- DWORD WINAPI recieve_function(LPVOID lpParam);
+
+ // Receive message from server
+ DWORD WINAPI receive_function(LPVOID lpParam);

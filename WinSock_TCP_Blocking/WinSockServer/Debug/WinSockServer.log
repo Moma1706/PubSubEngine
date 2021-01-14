@@ -1,1 +1,4 @@
-﻿  WinSockServer.vcxproj -> C:\Users\Milan\Desktop\Github\test\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe
+﻿  Server.cpp
+C:\Users\Lenovo\Documents\GitHub\PubSubEngine\WinSock_TCP_Blocking\Libraries\ServerFuncionality.h(15,1): warning C4005: 'BUFER_SIZE': macro redefinition
+C:\Users\Lenovo\Documents\GitHub\PubSubEngine\WinSock_TCP_Blocking\Libraries\Hash_Map.h(7): message : see previous definition of 'BUFER_SIZE'
+  WinSockServer.vcxproj -> C:\Users\Lenovo\Documents\GitHub\PubSubEngine\WinSock_TCP_Blocking\Debug\WinSockServer.exe
