@@ -36,13 +36,13 @@ int  main(void)
 
 		if (strcmp(quit, "Q") == 0) {
 
-			delete_cs();
-			CloseHandle(PubThread);
-			CloseHandle(SubThread);
-
 			ht_delete_map_pub(publisher_map);
 			ht_delete_map_socket(socket_map);
 			ht_delete_map_sub(subscriber_map);
+
+			CloseHandle(PubThread);
+			CloseHandle(SubThread);
+			delete_cs();
 			
 				
 			temp = 0;
