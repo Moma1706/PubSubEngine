@@ -15,8 +15,6 @@ int  main()
 
 	// variable used to store function return value
     int iResult;
-    // message to send
-    char *messageToSend = "this is a test";
 
     if(InitializeWindowsSockets() == false)
     {

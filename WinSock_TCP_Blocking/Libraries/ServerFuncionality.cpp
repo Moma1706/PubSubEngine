@@ -185,7 +185,7 @@ DWORD WINAPI thread_function(LPVOID lpParam) {
 						printf("Connection with client closed.\n");
 						closesocket(acceptedSocket[i]);
 						// sort array and clean last place
-
+						
 						for (int j = i; j < lastIndex - 1; j++)
 						{
 							acceptedSocket[j] = acceptedSocket[j + 1];

@@ -94,6 +94,8 @@ void remove_sub(node_s_t** head, SOCKET socket) {
 			free(temp);
 			return;
 		}
+		prev = temp;
+		temp = temp->next;
 	}
 	
 	return;

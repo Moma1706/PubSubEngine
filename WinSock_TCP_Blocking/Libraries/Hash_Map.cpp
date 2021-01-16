@@ -410,7 +410,6 @@ void ht_del_pub(ht_t* hashtable, const char* key) {
 	}
 }
 
-
 void ht_del_sub(ht_s_t* hashtable, const char* key) {
 	unsigned int bucket = hash(key);
 

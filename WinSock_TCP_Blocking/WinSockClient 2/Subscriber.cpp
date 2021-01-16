@@ -21,13 +21,6 @@ int main()
 	char messageToSend[BUFER_SIZE];
 	char recv_bufer[DEFAULT_BUFLEN];
 
-	fd_set readfds;
-	FD_ZERO(&readfds);
-
-	// maksimalni period cekanja select funkcije
-	timeval timeVal;
-	timeVal.tv_sec = 1;
-	timeVal.tv_usec = 0;
 
     if(InitializeWindowsSockets() == false)
     {
